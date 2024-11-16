@@ -1,0 +1,36 @@
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+# Load the dataset
+file_path = '/content/AB_NYC_2019.csv'
+data = pd.read_csv(file_path)
+# Display the first few rows of the dataset
+print("First few rows of the dataset:")
+print(data.head())
+# Basic information about the dataset
+print("\nDataset Info:")
+print(data.info())
+# Check for missing values
+print("\nMissing values in each column:")
+print(data.isnull().sum())
+# Handling missing data
+# Example: Filling missing values in the 'reviews_per_month' column with the median value
+if 'reviews_per_month' in data.columns:
+    median_value = data['reviews_per_month'].median()
+    data['reviews_per_month'].fillna(median_value, inplace=True)
+    print(f"\nFilled missing 'reviews_per_month' values with median value: {median_value}")
+# Removing duplicate entries
+initial_shape = data.shape
+data.drop_duplicates(inplace=True)
+print(f"\nRemoved duplicates. Shape changed from {initial_shape} to {data.shape}.")
+# Basic statistics of the dataset
+print("\nDataset Statistics:")
+print(data.describe())
+# Visualization example: Count plot of room types
+if 'room_type' in data.columns:
+    plt.figure(figsize=(10, 6))
+    sns.countplot(data=data, x='room_type', palette='viridis')
+    plt.title('Distribution of Room Types')
+    plt.xlabel('Room Type')
+    plt.ylabel('Count')
+    plt.show()

@@ -1,0 +1,43 @@
+# Import necessary libraries
+import pandas as pd
+import numpy as np
+import seaborn as sns
+import matplotlib.pyplot as plt
+from sklearn.model_selection import train_test_split
+from sklearn.feature_extraction.text import CountVectorizer, TfidfTransformer
+from sklearn.naive_bayes import MultinomialNB
+from sklearn.pipeline import Pipeline
+from sklearn import metrics
+# Load the dataset
+file_path = '/content/Twitter_Data.csv'  # Update path if needed
+data = pd.read_csv(file_path)
+# Display the first few rows to understand the data
+print(data.head())
+# Check for null values and handle them if necessary
+print(data.isnull().sum())
+data.dropna(inplace=True)
+# Assume the dataset has columns 'clean_text' and 'category' (update if different)
+X = data['clean_text']
+y = data['category']
+# Split the data into training and testing sets
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+# Create a pipeline for text processing and model training
+text_clf = Pipeline([
+    ('vect', CountVectorizer()),
+    ('tfidf', TfidfTransformer()),
+    ('clf', MultinomialNB()),
+])
+# Train the model
+text_clf.fit(X_train, y_train)
+# Predict on the test set
+y_pred = text_clf.predict(X_test)
+# Evaluate the model
+print(metrics.classification_report(y_test, y_pred))
+print('Accuracy:', metrics.accuracy_score(y_test, y_pred))
+# Visualize the results with a confusion matrix
+conf_mat = metrics.confusion_matrix(y_test, y_pred)
+sns.heatmap(conf_mat, annot=True, fmt='d', cmap='Blues', xticklabels=['Negative', 'Neutral', 'Positive'], yticklabels=['Negative', 'Neutral', 'Positive'])
+plt.xlabel('Predicted')
+plt.ylabel('Actual')
+plt.title('Confusion Matrix')
+plt.show()

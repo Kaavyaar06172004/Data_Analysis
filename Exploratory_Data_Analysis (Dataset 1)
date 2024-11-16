@@ -1,0 +1,66 @@
+# Import necessary libraries
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+# Load the dataset
+file_path = '/content/retail_sales_dataset.csv'  # Update the path if necessary
+data = pd.read_csv(file_path)
+# Display the first few rows of the dataset
+print("First few rows of the dataset:")
+print(data.head())
+# Step 1: Data Cleaning
+print("\nDataset Info:")
+print(data.info())
+print("\nMissing Values:")
+print(data.isnull().sum())
+# Fill missing values with 0 (if any)
+data.fillna(0, inplace=True)
+# Step 2: Descriptive Statistics
+print("\nDescriptive Statistics:")
+print(data.describe())
+# Step 3: Time Series Analysis
+# Convert the 'Date' column to datetime format
+data['Date'] = pd.to_datetime(data['Date'])
+# Group sales by month (based on 'Total Amount')
+monthly_sales = data.groupby(data['Date'].dt.to_period('M'))['Total Amount'].sum()
+# Plot the monthly sales trend
+plt.figure(figsize=(12, 6))
+monthly_sales.plot(kind='line', marker='o')
+plt.title('Monthly Sales Trend')
+plt.xlabel('Month')
+plt.ylabel('Total Sales Amount')
+plt.grid()
+plt.show()
+# Step 4: Customer and Product Analysis
+# Top customers by total spending
+top_customers = data.groupby('Customer ID')['Total Amount'].sum().sort_values(ascending=False).head(10)
+print("\nTop 10 Customers by Total Spending:")
+print(top_customers)
+# Top product categories by sales
+top_products = data.groupby('Product Category')['Total Amount'].sum().sort_values(ascending=False)
+print("\nSales by Product Category:")
+print(top_products)
+# Step 5: Visualization
+# Distribution of Total Amount
+plt.figure(figsize=(12, 6))
+sns.histplot(data['Total Amount'], bins=30, kde=True)
+plt.title("Distribution of Total Amount")
+plt.xlabel("Total Amount")
+plt.ylabel("Frequency")
+plt.show()
+# Compute correlation matrix for numerical columns only
+numeric_data = data.select_dtypes(include=['number'])  # Select only numeric columns
+correlation_matrix = numeric_data.corr()
+
+# Plot the heatmap
+plt.figure(figsize=(10, 6))
+sns.heatmap(correlation_matrix, annot=True, cmap='coolwarm', fmt=".2f")
+plt.title("Correlation Heatmap")
+plt.show()
+
+# Step 6: Recommendations
+print("\nRecommendations:")
+print("1. Focus on the top product categories to maximize revenue.")
+print("2. Target marketing efforts at high-value customers.")
+print("3. Analyze the trends in monthly sales to identify seasonal patterns.")

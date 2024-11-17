@@ -1,0 +1,73 @@
+# Import necessary libraries
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import mean_squared_error, r2_score
+# Load the dataset
+file_path = '/content/Housing.csv'  # Update this path if needed
+data = pd.read_csv(file_path)
+# Display basic information about the dataset
+print("Dataset Overview:")
+print(data.head())
+print("\nDataset Info:")
+print(data.info())
+# Data Cleaning: Handle missing values (if any)
+print("\nChecking for missing values:")
+print(data.isnull().sum())
+data = data.dropna()  # Drop rows with missing values
+# Exploratory Data Analysis (EDA)
+print("\nStatistical Summary:")
+print(data.describe())
+# Encode categorical variables
+data_encoded = pd.get_dummies(data, drop_first=True)
+
+# Check the first few rows of the encoded data
+print("Encoded Data Overview:")
+print(data_encoded.head())
+
+# Correlation heatmap with encoded data
+plt.figure(figsize=(10, 8))
+sns.heatmap(data_encoded.corr(), annot=True, cmap='coolwarm', fmt='.2f')
+plt.title("Correlation Heatmap")
+plt.show()
+# Feature selection: Define features (X) and target (y)
+target_column = 'price'  # Replace 'price' with the actual column name for the target variable
+X = data.drop(columns=[target_column])
+y = data[target_column]
+# Separate features (X) and target (y)
+target_column = 'price'  # Replace 'price' with the actual column name for the target variable
+X = data.drop(columns=[target_column])
+y = data[target_column]
+
+# Encode categorical variables in the feature matrix
+X = pd.get_dummies(X, drop_first=True)
+
+# Check the transformed feature matrix
+print("\nTransformed Feature Matrix (after encoding):")
+print(X.head())
+# Split data into training and testing sets
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+# Model training using Linear Regression
+model = LinearRegression()
+model.fit(X_train, y_train)
+
+# Model evaluation on the test set
+y_pred = model.predict(X_test)
+mse = mean_squared_error(y_test, y_pred)
+r2 = r2_score(y_test, y_pred)
+
+print(f"\nModel Performance:")
+print(f"Mean Squared Error (MSE): {mse}")
+print(f"R-squared (R²): {r2}")
+# Visualization: Predicted vs. Actual values
+plt.figure(figsize=(8, 6))
+plt.scatter(y_test, y_pred, alpha=0.7)
+plt.plot([min(y_test), max(y_test)], [min(y_test), max(y_test)], color='red', linewidth=2)
+plt.title("Predicted vs Actual Values")
+plt.xlabel("Actual Values")
+plt.ylabel("Predicted Values")
+plt.show()

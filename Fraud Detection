@@ -1,0 +1,45 @@
+# Import necessary libraries
+import pandas as pd
+import numpy as np
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import classification_report, confusion_matrix
+from sklearn.impute import SimpleImputer
+# Load the dataset
+file_path = '/content/creditcard.csv'  # Update this path if necessary
+df = pd.read_csv(file_path)
+# Basic data exploration
+print("Dataset preview:")
+print(df.head())
+print("\nSummary statistics:")
+print(df.describe())
+# Check for missing values
+if df.isnull().sum().any():
+    print("\nMissing values detected!")
+    print(df.isnull().sum())
+else:
+    print("\nNo missing values found.")
+# Fill missing values using SimpleImputer
+imputer = SimpleImputer(strategy='median')
+df_imputed = pd.DataFrame(imputer.fit_transform(df), columns=df.columns)
+# Feature selection and scaling
+X = df_imputed.drop('Class', axis=1)  # Assuming 'Class' is the target column with 0 for legitimate and 1 for fraud
+y = df_imputed['Class']
+
+scaler = StandardScaler()
+X_scaled = scaler.fit_transform(X)
+# Split the dataset into training and testing sets
+X_train, X_test, y_train, y_test = train_test_split(X_scaled, y, test_size=0.3, random_state=42)
+
+# Train a logistic regression model
+model = LogisticRegression()
+model.fit(X_train, y_train)
+
+# Make predictions
+y_pred = model.predict(X_test)
+# Evaluate the model
+print("\nConfusion Matrix:")
+print(confusion_matrix(y_test, y_pred))
+print("\nClassification Report:")
+print(classification_report(y_test, y_pred))
